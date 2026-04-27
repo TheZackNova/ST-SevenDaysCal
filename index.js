@@ -865,4 +865,39 @@ function parseCalendar(raw) {
     const days = []; let cur = null;
     for (const line of content.split('\n')) {
         const t = line.trim();
-        if (!t || t.startsWith('
+        if (!t || t.startsWith('<!--')) continue;
+        if (/^Day\s*:?\s*\d+/i.test(t) || /^第[一二三四五六七\d]+天/.test(t)) {
+            if (cur) days.push(cur); cur = { events: [] }; continue;
+        }
+        if (/^Event\s*:/i.test(t)) {
+            if (!cur) cur = { events: [] };
+            const parts = t.replace(/^Event\s*:\s*/i, '').split('|');
+            if (parts.length >= 4) cur.events.push({
+                type: (parts[0]||'user').trim().toLowerCase(), title: (parts[1]||'').trim(),
+                desc: (parts[2]||'').trim(), time: (parts[3]||'').trim(),
+                location: (parts[4]||'').trim(), npcAction: (parts[5]||'').trim(),
+            });
+        }
+    }
+    if (cur) days.push(cur);
+    return { days: days.filter(d => d.events.length > 0), startDate };
+}
+
+function renderEvent(ev) {
+    const meta = TYPE_META[ev.type] || TYPE_META.user;
+    return `<div class="sp-event ${meta.cls}">
+        <div class="sp-event-head">
+            <span class="sp-type-badge"><i class="fa-solid ${meta.icon}"></i>${escapeHtml(meta.label)}</span>
+            <span class="sp-event-title">${escapeHtml(ev.title)}</span>
+            ${ev.time ? `<span class="sp-event-time"><i class="fa-regular fa-clock"></i> ${escapeHtml(ev.time)}</span>` : ''}
+        </div>
+        ${ev.desc ? `<p class="sp-event-desc">${escapeHtml(ev.desc)}</p>` : ''}
+        <div class="sp-event-meta">
+            ${ev.location  ? `<span class="sp-event-loc">地点：${escapeHtml(ev.location)}</span>` : ''}
+            ${ev.npcAction ? `<span class="sp-event-npc">NPC：${escapeHtml(ev.npcAction)}</span>` : ''}
+        </div>
+    </div>`;
+}
+
+function escapeHtml(s)  { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escapeAttr(s)  { return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
