@@ -7,8 +7,8 @@ const FAB_ID     = 'sp-fab';
 const THEME_KEY  = 'sp-theme';
 const API_KEY    = 'sp-api-cfg';
 const POS_KEY    = 'sp-pos';
-const SIZE_KEY    = 'sp-size';
-const FAB_KEY     = 'sp-fab-show';
+const SIZE_KEY   = 'sp-size';
+const FAB_KEY    = 'sp-fab-show';
 
 // view: 'user' | 'char'   charName: confirmed char name
 function getCacheKey(view, charName) {
@@ -25,7 +25,7 @@ function loadCachedForCurrentChat(view, charName) {
     if (!key) return null;
     try {
         const saved = JSON.parse(localStorage.getItem(key) || 'null');
-        if (saved?.raw) return renderSchedule(saved.raw, saved.userName || '用户');
+        if (saved?.raw) return renderSchedule(saved.raw, saved.userName || 'Người dùng');
     } catch { /* ignore corrupt cache */ }
     return null;
 }
@@ -60,7 +60,7 @@ jQuery(async () => {
         cachedSchedule = loadCachedForCurrentChat();
         if ($(`#${MODAL_ID}`).is(':visible') && !isGenerating) {
             if (cachedSchedule) setBody(cachedSchedule);
-            else setBody(`<div class="sp-empty"><i class="fa-regular fa-calendar"></i><p>暂无日程，点击右下角生成</p></div>`);
+            else setBody(`<div class="sp-empty"><i class="fa-regular fa-calendar"></i><p>Chưa có lịch trình, nhấp vào góc dưới bên phải để tạo</p></div>`);
         }
     });
     window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', e => {
@@ -81,18 +81,18 @@ function injectExtButton() {
     const html = `
         <div id="${PLUGIN_ID}-settings" class="inline-drawer">
             <div class="inline-drawer-toggle inline-drawer-header">
-                <b>七日日程规划</b>
+                <b>Kế hoạch lịch trình 7 ngày</b>
                 <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
             </div>
             <div class="inline-drawer-content">
                 <div class="sp-ext-row">
                     <button id="sp-open-btn" class="menu_button menu_button_icon">
                         <i class="fa-solid fa-calendar-days"></i>
-                        <span>打开日程</span>
+                        <span>Mở lịch trình</span>
                     </button>
                     <label class="sp-toggle-label">
                         <input type="checkbox" id="sp-fab-check" ${fabEnabled() ? 'checked' : ''}>
-                        悬浮按钮
+                        Nút nổi
                     </label>
                 </div>
             </div>
@@ -125,7 +125,7 @@ function injectFab() {
         ? `left:${savedPos.left}px;top:${savedPos.top}px;right:auto;bottom:auto;`
         : '';
     const html = `<div id="${FAB_ID}" style="position:fixed;z-index:2000000;${posStyle}${fabEnabled() ? '' : 'display:none'}">
-        <button class="sp-fab-btn sp-${currentTheme}" title="七日日程"
+        <button class="sp-fab-btn sp-${currentTheme}" title="Lịch trình 7 ngày"
             style="width:44px;height:44px;border-radius:50%;background:#3a3648;color:#d0bcff;border:1.5px solid rgba(208,188,255,0.35);display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.5);transform:translateZ(0);clip:auto;">
             <i class="fa-solid fa-calendar-days"></i>
         </button>
@@ -223,16 +223,16 @@ function injectModal() {
             <div class="sp-backdrop"></div>
             <div class="sp-sheet">
                 <div class="sp-topbar" id="sp-drag-handle">
-                    <span class="sp-topbar-title">七日日程</span>
+                    <span class="sp-topbar-title">Lịch trình 7 ngày</span>
                     <div class="sp-view-toggle">
-                        <button class="sp-view-btn sp-view-active" data-view="user">我</button>
+                        <button class="sp-view-btn sp-view-active" data-view="user">Tôi</button>
                         <button class="sp-view-btn" data-view="char">TA</button>
                     </div>
                     <div class="sp-topbar-actions">
-                        <button class="sp-icon-btn sp-settings-btn" title="设置"><i class="fa-solid fa-gear"></i></button>
-                        <button class="sp-icon-btn sp-theme-btn"    title="切换主题"><i class="fa-solid fa-circle-half-stroke"></i></button>
-                        <button class="sp-icon-btn sp-regen-btn"    title="重新生成"><i class="fa-solid fa-rotate-right"></i></button>
-                        <button class="sp-icon-btn sp-close-btn"    title="关闭"><i class="fa-solid fa-xmark"></i></button>
+                        <button class="sp-icon-btn sp-settings-btn" title="Cài đặt"><i class="fa-solid fa-gear"></i></button>
+                        <button class="sp-icon-btn sp-theme-btn"    title="Chuyển đổi giao diện"><i class="fa-solid fa-circle-half-stroke"></i></button>
+                        <button class="sp-icon-btn sp-regen-btn"    title="Tạo lại"><i class="fa-solid fa-rotate-right"></i></button>
+                        <button class="sp-icon-btn sp-close-btn"    title="Đóng"><i class="fa-solid fa-xmark"></i></button>
                     </div>
                 </div>
 
@@ -240,12 +240,12 @@ function injectModal() {
                     <div class="sp-api-notice ${hasCustomApi ? 'sp-notice-ok' : 'sp-notice-warn'}">
                         <i class="fa-solid ${hasCustomApi ? 'fa-circle-check' : 'fa-triangle-exclamation'}"></i>
                         ${hasCustomApi
-                            ? '已配置独立 API，后台生成不影响聊天'
-                            : '未配置独立 API：生成期间将<b>占用聊天通道</b>，无法同时聊天'}
+                            ? 'Đã cấu hình API độc lập, tạo dưới nền không ảnh hưởng đến trò chuyện'
+                            : 'Chưa cấu hình API độc lập: Trong quá trình tạo sẽ <b>chiếm dụng kênh trò chuyện</b>, không thể trò chuyện đồng thời'}
                     </div>
-                    <p class="sp-cfg-hint">自定义 API（留空则使用酒馆当前模型）</p>
+                    <p class="sp-cfg-hint">API tùy chỉnh (Để trống sẽ sử dụng mô hình hiện tại của SillyTavern)</p>
                     <input id="sp-cfg-url"   class="sp-input" type="url"
-                           placeholder="Base URL，如 https://api.openai.com/v1"
+                           placeholder="Base URL, ví dụ: https://api.openai.com/v1"
                            value="${escapeAttr(cfg.url || '')}">
                     <div class="sp-key-row">
                         <input id="sp-cfg-key" class="sp-input sp-key-input" type="password"
@@ -254,18 +254,18 @@ function injectModal() {
                     </div>
                     <div class="sp-model-row">
                         <input id="sp-cfg-model" class="sp-input sp-model-input" type="text"
-                               placeholder="模型名称，如 gpt-4o-mini"
+                               placeholder="Tên mô hình, ví dụ: gpt-4o-mini"
                                value="${escapeAttr(cfg.model || '')}">
-                        <button id="sp-fetch-models" class="sp-fetch-btn" title="拉取模型列表">
+                        <button id="sp-fetch-models" class="sp-fetch-btn" title="Tải danh sách mô hình">
                             <i class="fa-solid fa-list"></i>
                         </button>
                     </div>
-                    <button id="sp-cfg-save" class="sp-save-btn"><i class="fa-solid fa-floppy-disk"></i> 保存</button>
+                    <button id="sp-cfg-save" class="sp-save-btn"><i class="fa-solid fa-floppy-disk"></i> Lưu</button>
                     <span id="sp-cfg-msg" class="sp-cfg-msg"></span>
                 </div>
 
                 <div class="sp-body" id="sp-body">
-                    <div class="sp-empty"><i class="fa-regular fa-calendar"></i><p>点击右上角刷新按钮生成日程</p></div>
+                    <div class="sp-empty"><i class="fa-regular fa-calendar"></i><p>Nhấp vào nút làm mới ở góc trên bên phải để tạo lịch trình</p></div>
                 </div>
 
                 <div class="sp-resize-handle" id="sp-resize-handle">
@@ -283,7 +283,7 @@ function injectModal() {
     $(`#${MODAL_ID} .sp-settings-btn`).on('click', toggleSettings);
     $(`#${MODAL_ID} .sp-backdrop`).on('click',     closePanel);
 
-    // View toggle: 我 / TA
+    // View toggle: Tôi / TA
     $(`#${MODAL_ID} .sp-view-toggle`).on('click', '.sp-view-btn', function () {
         if (isGenerating) return;
         const view = $(this).data('view');
@@ -326,7 +326,7 @@ function injectModal() {
     restorePositionAndSize();
 }
 
-// ─── View (我 / TA) ───────────────────────────────────────────────────────────
+// ─── View (Tôi / TA) ───────────────────────────────────────────────────────────
 
 function onRegenClick() {
     if (isGenerating) return;
@@ -373,13 +373,13 @@ function switchToCharView() {
     // Prefer previously confirmed name; fall back to guessing from chat messages
     const guessed = charViewName || guessCharName(ctx);
     setBody(`<div class="sp-char-picker">
-        <p class="sp-char-picker-hint"><i class="fa-solid fa-user-pen"></i> 输入要查看日程的角色名</p>
+        <p class="sp-char-picker-hint"><i class="fa-solid fa-user-pen"></i> Nhập tên nhân vật muốn xem lịch trình</p>
         <div class="sp-char-picker-row">
             <input id="sp-char-name-input" class="sp-input" type="text"
-                   placeholder="角色名" value="${escapeAttr(guessed)}">
-            <button id="sp-char-name-confirm" class="sp-save-btn">确认</button>
+                   placeholder="Tên nhân vật" value="${escapeAttr(guessed)}">
+            <button id="sp-char-name-confirm" class="sp-save-btn">Xác nhận</button>
         </div>
-        ${guessed ? `<p class="sp-char-picker-sub">根据近期对话预填，可直接修改</p>` : ''}
+        ${guessed ? `<p class="sp-char-picker-sub">Tự động điền dựa trên đoạn hội thoại gần đây, có thể sửa trực tiếp</p>` : ''}
     </div>`);
     $('.sp-view-btn').removeClass('sp-view-active');
     $(`.sp-view-btn[data-view="char"]`).addClass('sp-view-active');
@@ -396,7 +396,7 @@ function confirmCharView() {
     if (cachedSchedule) {
         setBody(cachedSchedule);
     } else {
-        setBody(`<div class="sp-loading"><div class="sp-spinner"></div><p class="sp-loading-text">正在规划中…</p></div>`);
+        setBody(`<div class="sp-loading"><div class="sp-spinner"></div><p class="sp-loading-text">Đang lập kế hoạch…</p></div>`);
         if (!isGenerating) {
             isGenerating = true;
             setExtBtnState('generating');
@@ -410,7 +410,7 @@ function confirmCharView() {
 function openSchedule() {
     showPanel();
     if (isGenerating) {
-        setBody(`<div class="sp-loading"><div class="sp-spinner"></div><p class="sp-loading-text">正在规划中…</p></div>`);
+        setBody(`<div class="sp-loading"><div class="sp-spinner"></div><p class="sp-loading-text">Đang lập kế hoạch…</p></div>`);
     } else if (cachedSchedule) {
         setBody(cachedSchedule);
     } else {
@@ -421,7 +421,7 @@ function openSchedule() {
 function showEmptyGenerate() {
     setBody(`<div class="sp-empty">
         <i class="fa-regular fa-calendar"></i>
-        <button class="sp-gen-btn" id="sp-gen-now">生成日程</button>
+        <button class="sp-gen-btn" id="sp-gen-now">Tạo lịch trình</button>
     </div>`);
     $('#sp-gen-now').on('click', triggerGenerate);
 }
@@ -451,7 +451,7 @@ function triggerGenerate() {
     isGenerating = true;
     setExtBtnState('generating');
     if (!$(`#${MODAL_ID}`).is(':visible')) showPanel();
-    setBody(`<div class="sp-loading"><div class="sp-spinner"></div><p class="sp-loading-text">正在规划中…</p></div>`);
+    setBody(`<div class="sp-loading"><div class="sp-spinner"></div><p class="sp-loading-text">Đang lập kế hoạch…</p></div>`);
     runGenerate();
 }
 
@@ -462,8 +462,8 @@ async function runGenerate() {
     try {
         const ctx      = getContext();
         // ctx.name1 is the user's display name set in ST persona; no template processing needed
-        const userName = ctx.name1 || '用户';
-        const charName = viewSnap === 'char' ? (charSnap || ctx.name2 || '角色') : (ctx.name2 || '角色');
+        const userName = ctx.name1 || 'Người dùng';
+        const charName = viewSnap === 'char' ? (charSnap || ctx.name2 || 'Nhân vật') : (ctx.name2 || 'Nhân vật');
         const subject  = viewSnap === 'char' ? charName : userName;
         const raw      = await generate(ctx, userName, charName, viewSnap);
         const html     = renderSchedule(raw, subject);
@@ -481,9 +481,9 @@ async function runGenerate() {
         if (stillOnView) {
             cachedSchedule = html;
             if ($(`#${MODAL_ID}`).is(':visible')) setBody(html);
-            else showToast('日程已生成，点击查看', () => { showPanel(); setBody(html); });
+            else showToast('Lịch trình đã được tạo, nhấp để xem', () => { showPanel(); setBody(html); });
         } else {
-            showToast('日程已生成，点击查看', () => {
+            showToast('Lịch trình đã được tạo, nhấp để xem', () => {
                 setView(viewSnap, charSnap);
                 cachedSchedule = html;
                 showPanel();
@@ -494,9 +494,9 @@ async function runGenerate() {
     } catch (err) {
         isGenerating = false;
         setExtBtnState(null);
-        const errHtml = `<div class="sp-error"><i class="fa-solid fa-circle-exclamation"></i><p>生成失败：${escapeHtml(err.message || '未知错误')}</p></div>`;
+        const errHtml = `<div class="sp-error"><i class="fa-solid fa-circle-exclamation"></i><p>Tạo thất bại: ${escapeHtml(err.message || 'Lỗi không xác định')}</p></div>`;
         if ($(`#${MODAL_ID}`).is(':visible') && currentView === viewSnap) setBody(errHtml);
-        else showToast('日程生成失败，请重试', null, true);
+        else showToast('Tạo lịch trình thất bại, vui lòng thử lại', null, true);
     }
 }
 
@@ -504,7 +504,7 @@ async function generate(ctx, userName, charName, perspective = 'user') {
     const cfg = loadCfg();
     if (!cfg.url || !cfg.key) {
         if (!settingsOpen) toggleSettings();
-        throw new Error('请先在设置中填写自定义 API 的 URL 和 Key');
+        throw new Error('Vui lòng điền URL và Key của API tùy chỉnh trong Cài đặt trước');
     }
     const prompt = buildPrompt(userName, charName, perspective);
     return callCustomApi(ctx, prompt, cfg, userName, charName);
@@ -523,9 +523,9 @@ async function callCustomApi(ctx, prompt, cfg, userName, charName) {
 
 function buildMessages(ctx, prompt, userName, charName) {
     const char = ctx.characters?.[ctx.characterId] ?? {};
-    const sys  = [`你正在扮演 ${charName}。`, char.description,
-        char.personality ? `【性格】${char.personality}` : '',
-        char.scenario    ? `【场景】${char.scenario}`    : '',
+    const sys  = [`Bạn đang đóng vai ${charName}.`, char.description,
+        char.personality ? `【Tính cách】${char.personality}` : '',
+        char.scenario    ? `【Bối cảnh】${char.scenario}`    : '',
     ].filter(Boolean).join('\n\n');
     // substituteParams resolves {{user}}/{{char}} templates in chat messages
     const history = (ctx.chat ?? []).slice(-40).map(m => ({
@@ -538,25 +538,24 @@ function buildMessages(ctx, prompt, userName, charName) {
 function buildPrompt(userName, charName, perspective = 'user') {
     const subject   = perspective === 'char' ? charName : userName;
     const companion = perspective === 'char' ? userName : charName;
-    return `请暂停角色扮演，以写作助手身份完成以下任务（内容仅作参考，不出现在正文）：
-【重要】无论剧情使用何种语言，所有输出内容必须使用中文（人名、地名可保留原文）。
+    return `Vui lòng tạm dừng nhập vai, hãy hoàn thành nhiệm vụ sau với tư cách là trợ lý viết (nội dung chỉ mang tính tham khảo, không xuất hiện trong văn bản chính):
+【Quan trọng】Bất kể cốt truyện sử dụng ngôn ngữ nào, tất cả nội dung đầu ra phải sử dụng tiếng Việt (tên người, địa danh có thể giữ nguyên bản gốc).
 
-根据以上剧情背景与世界设定，为 ${subject} 规划接下来七天的日程安排。
+Dựa trên bối cảnh cốt truyện và thiết lập thế giới ở trên, hãy lập kế hoạch lịch trình 7 ngày tới cho ${subject}.
 
-【具体规则】
-1. 时间跨度：必须生成包含今日起连续未来 7 天的日程，禁止遗漏任何一天。
-2. 事件数量：每天安排 2 到 5 个事件，总计 15-30 个事件。
-3. 内容来源：基于当前对话剧情、世界观设定以及角色关系合理推演。
-4. 字段规范（每行一个 Event）：
-   格式：Event: type|title|description|time|location|npc_action
+【Quy tắc cụ thể】
+1. Khoảng thời gian: Phải tạo lịch trình bao gồm 7 ngày liên tiếp kể từ hôm nay, cấm bỏ sót bất kỳ ngày nào.
+2. Số lượng sự kiện: Sắp xếp 2 đến 5 sự kiện mỗi ngày, tổng cộng 15-30 sự kiện.
+3. Nguồn nội dung: Suy luận hợp lý dựa trên cốt truyện đối thoại hiện tại, thiết lập thế giới quan và mối quan hệ giữa các nhân vật.
+4. Quy chuẩn trường dữ liệu (mỗi dòng một Event):
+   Định dạng: Event: type|title|description|time|location|npc_action
    - type：world / major / user / character
-   - description：${subject} 视角，生活化口吻，30字以上
-   - npc_action：${companion} 同期行动，30字以上
+   - description: Góc nhìn của ${subject}, giọng điệu đời thường, trên 30 từ
+   - npc_action: Hành động đồng thời của ${companion}, trên 30 từ
 
-【输出格式（严格遵守，只输出以下结构）】
-<!-- 日程思考：（根据当前剧情思考安排，100字以上） -->
+【Định dạng đầu ra (tuân thủ nghiêm ngặt, chỉ xuất ra cấu trúc sau)】
 <calendar_widget>
-StartDate: YYYY-MM-DD （若剧情中能明确或合理推断故事当前日期则填写，格式如 2024-03-15；若完全无法确定则省略此行）
+StartDate: YYYY-MM-DD (Nếu cốt truyện có thể xác định hoặc suy luận hợp lý ngày tháng hiện tại của câu chuyện thì điền vào, định dạng ví dụ 2024-03-15; nếu hoàn toàn không thể xác định thì bỏ qua dòng này)
 Day: 1
 Event: type|title|description|time|location|npc_action
 Event: type|title|description|time|location|npc_action
@@ -580,7 +579,7 @@ Event: type|title|description|time|location|npc_action
 async function fetchModels() {
     const url = $('#sp-cfg-url').val().trim().replace(/\/$/, '');
     const key = ($('#sp-cfg-key').data('real') || $('#sp-cfg-key').val()).trim();
-    if (!url || !key) { showToast('请先填写 URL 和 Key', null, true); return; }
+    if (!url || !key) { showToast('Vui lòng điền URL và Key trước', null, true); return; }
 
     const $btn = $('#sp-fetch-models');
     $btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin"></i>');
@@ -593,7 +592,7 @@ async function fetchModels() {
         const models = (data.data || data.models || [])
             .map(m => (typeof m === 'string' ? m : m.id))
             .filter(Boolean).sort();
-        if (!models.length) throw new Error('接口未返回任何模型');
+        if (!models.length) throw new Error('Giao diện không trả về bất kỳ mô hình nào');
 
         const current = loadCfg().model || '';
         const opts = models.map(m =>
@@ -603,9 +602,9 @@ async function fetchModels() {
             `<select id="sp-cfg-model" class="sp-input sp-model-input">${opts}</select>`
         );
         if (!current) $('#sp-cfg-model').val(models[0]);
-        showToast(`已加载 ${models.length} 个模型`);
+        showToast(`Đã tải ${models.length} mô hình`);
     } catch (err) {
-        showToast(`获取模型失败：${err.message}`, null, true);
+        showToast(`Tải mô hình thất bại: ${err.message}`, null, true);
     } finally {
         $btn.prop('disabled', false).html('<i class="fa-solid fa-list"></i>');
     }
@@ -632,14 +631,14 @@ function saveSettings() {
     const $k = $('#sp-cfg-key'), key = ($k.data('real') || $k.val()).trim();
     saveCfg({ url: $('#sp-cfg-url').val().trim().replace(/\/$/, ''), key, model: $('#sp-cfg-model').val().trim() });
     $k.data('real', key).val(maskKey(key)).attr('type', 'password');
-    const $m = $('#sp-cfg-msg'); $m.text('已保存 ✓'); setTimeout(() => $m.text(''), 2000);
+    const $m = $('#sp-cfg-msg'); $m.text('Đã lưu ✓'); setTimeout(() => $m.text(''), 2000);
     const hasApi = !!(loadCfg().url && loadCfg().key);
     $('.sp-api-notice')
         .removeClass('sp-notice-ok sp-notice-warn')
         .addClass(hasApi ? 'sp-notice-ok' : 'sp-notice-warn')
         .html(`<i class="fa-solid ${hasApi ? 'fa-circle-check' : 'fa-triangle-exclamation'}"></i>
-            ${hasApi ? '已配置独立 API，后台生成不影响聊天'
-                     : '未配置独立 API：生成期间将<b>占用聊天通道</b>'}`);
+            ${hasApi ? 'Đã cấu hình API độc lập, tạo dưới nền không ảnh hưởng đến trò chuyện'
+                     : 'Chưa cấu hình API độc lập: Trong quá trình tạo sẽ <b>chiếm dụng kênh trò chuyện</b>'}`);
     setTimeout(() => { if (settingsOpen) toggleSettings(); }, 400);
 }
 
@@ -808,9 +807,9 @@ function showToast(msg, onClick, isError = false) {
 // ─── Rendering ────────────────────────────────────────────────────────────────
 
 const TYPE_META = {
-    world    : { icon: 'fa-earth-asia', label: '世界',  cls: 'sp-type-world'     },
-    major    : { icon: 'fa-star',       label: '大事',  cls: 'sp-type-major'     },
-    user     : { icon: 'fa-user',       label: '个人',  cls: 'sp-type-user'      },
+    world    : { icon: 'fa-earth-asia', label: 'Thế giới',  cls: 'sp-type-world'     },
+    major    : { icon: 'fa-star',       label: 'Sự kiện lớn',  cls: 'sp-type-major'     },
+    user     : { icon: 'fa-user',       label: 'Cá nhân',  cls: 'sp-type-user'       },
     character: { icon: 'fa-heart',      label: 'NPC',   cls: 'sp-type-character' },
 };
 
@@ -818,11 +817,11 @@ function renderSchedule(raw, userName) {
     const { days, startDate } = parseCalendar(raw);
     if (days.length === 0) return `<div class="sp-raw">${escapeHtml(raw).replace(/\n/g, '<br>')}</div>`;
 
-    const WEEKDAYS = ['周日','周一','周二','周三','周四','周五','周六'];
+    const WEEKDAYS = ['CN','T2','T3','T4','T5','T6','T7'];
 
     const header = `<div class="sp-schedule-header">
         <span class="sp-user-chip">${escapeHtml(userName)}</span>
-        <span class="sp-schedule-label">的七日日程</span>
+        <span class="sp-schedule-label"> - Lịch trình 7 ngày</span>
     </div>`;
 
     const tabs = days.map((_, i) => {
@@ -845,7 +844,7 @@ function renderSchedule(raw, userName) {
     ).join('');
 
     const debug = days.length < 7 ? `
-        <details class="sp-debug"><summary>⚠ 仅解析到 ${days.length} 天</summary>
+        <details class="sp-debug"><summary>⚠ Chỉ phân tích được ${days.length} ngày</summary>
         <pre class="sp-debug-raw">${escapeHtml(raw)}</pre></details>` : '';
 
     return `${header}<div class="sp-tab-bar">${tabs}</div>
@@ -866,39 +865,4 @@ function parseCalendar(raw) {
     const days = []; let cur = null;
     for (const line of content.split('\n')) {
         const t = line.trim();
-        if (!t || t.startsWith('<!--')) continue;
-        if (/^Day\s*:?\s*\d+/i.test(t) || /^第[一二三四五六七\d]+天/.test(t)) {
-            if (cur) days.push(cur); cur = { events: [] }; continue;
-        }
-        if (/^Event\s*:/i.test(t)) {
-            if (!cur) cur = { events: [] };
-            const parts = t.replace(/^Event\s*:\s*/i, '').split('|');
-            if (parts.length >= 4) cur.events.push({
-                type: (parts[0]||'user').trim().toLowerCase(), title: (parts[1]||'').trim(),
-                desc: (parts[2]||'').trim(), time: (parts[3]||'').trim(),
-                location: (parts[4]||'').trim(), npcAction: (parts[5]||'').trim(),
-            });
-        }
-    }
-    if (cur) days.push(cur);
-    return { days: days.filter(d => d.events.length > 0), startDate };
-}
-
-function renderEvent(ev) {
-    const meta = TYPE_META[ev.type] || TYPE_META.user;
-    return `<div class="sp-event ${meta.cls}">
-        <div class="sp-event-head">
-            <span class="sp-type-badge"><i class="fa-solid ${meta.icon}"></i>${escapeHtml(meta.label)}</span>
-            <span class="sp-event-title">${escapeHtml(ev.title)}</span>
-            ${ev.time ? `<span class="sp-event-time"><i class="fa-regular fa-clock"></i> ${escapeHtml(ev.time)}</span>` : ''}
-        </div>
-        ${ev.desc ? `<p class="sp-event-desc">${escapeHtml(ev.desc)}</p>` : ''}
-        <div class="sp-event-meta">
-            ${ev.location  ? `<span class="sp-event-loc">地点：${escapeHtml(ev.location)}</span>` : ''}
-            ${ev.npcAction ? `<span class="sp-event-npc">NPC：${escapeHtml(ev.npcAction)}</span>` : ''}
-        </div>
-    </div>`;
-}
-
-function escapeHtml(s)  { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function escapeAttr(s)  { return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+        if (!t || t.startsWith('
